@@ -1,24 +1,54 @@
-import { Container } from "./styles";
+import { useEffect, useState } from 'react';
+import {format, parseISO} from 'date-fns'
+import { Container } from './styles';
+import api from '../../services/api';
+
+interface CourseUnit {
+    name: string;
+}
+
+interface Activy {
+    id: string;
+    name: string;
+    grade: number;
+    activy_date: string;
+    course_unit: CourseUnit
+}
 
 export function ActivyTable() {
+
+    const [activies, setActivies] = useState<Activy[]>([])
+
+    useEffect(() => {
+
+        api.get('/activy')
+            .then(response => setActivies(response.data))
+    },[])
+
     return (
         <Container>
             <table>
                 <thead>
                     <tr>
-                        <th>Unidade curricular</th>
-                        <th>Atividades</th>
+                        <th>Unidade Curricular</th>
+                        <th>Atividade</th>
                         <th>Avaliação</th>
                         <th>Data</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Programação web</td>
-                        <td>Desenvolvimento do front-end</td>
-                        <td>10</td>
-                        <td>23/05/2021</td>
-                    </tr>
+                    {
+                        activies.map(activy => {
+                            return (
+                                <tr key={activy.id}>
+                                    <td>{activy.course_unit.name}</td>
+                                    <td>{activy.name}</td>
+                                    <td>{activy.grade}</td>
+                                    <td>{format(parseISO(activy.activy_date), 'dd/MM/yyyy')}</td>
+                                </tr>
+                            )
+                        })
+                    }
                 </tbody>
             </table>
         </Container>
